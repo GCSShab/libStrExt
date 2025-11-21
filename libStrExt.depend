@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1763707874 source:/home/tondeur-h/dev/libStrExt/tools.c
+	"tools.h"
+
+1763707918 /home/tondeur-h/dev/libStrExt/tools.h
+	<string.h>
+	<ctype.h>
+	<stdlib.h>
+	<time.h>
+	<stdio.h>
+	<stdbool.h>
+
+1763708079 source:/home/tondeur-h/dev/libStrExt/main.c
+	"tools.h"
+
