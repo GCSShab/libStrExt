@@ -1,5 +1,309 @@
 #include "tools.h"
 
+
+#include <stdio.h>
+#include <string.h>
+
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>   // pour isspace()
+
+/*********************
+* strip
+*********************/
+void strip(char *str)
+{
+    if (str == NULL) return;
+
+    char *src = str;
+    char *dst = str;
+
+    while (*src != '\0')
+    {
+        if (!isspace((unsigned char)*src))
+        {
+            *dst = *src;   // copie seulement les caractères non blancs
+            dst++;
+        }
+        src++;
+    }
+    *dst = '\0'; // termine la chaîne
+}
+
+/***********************
+* Split String
+***********************/
+char **splitWithDelimiters(const char *str, char separateur)
+{
+    if (str == NULL) return NULL;
+
+    int count = 1; // au moins 1 sous-chaîne
+    for (const char *p = str; *p; p++)
+    {
+        if (*p == separateur) count++;
+    }
+
+    // Allocation du tableau de pointeurs (+1 pour le NULL final)
+    char **result = (char **)malloc((count + 1) * sizeof(char *));
+    if (result == NULL)
+    {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        return NULL;
+    }
+
+    int idx = 0;
+    const char *start = str;
+    const char *p = str;
+
+    while (*p)
+    {
+        if (*p == separateur)
+        {
+            int len = p - start;
+            result[idx] = (char *)malloc(len + 1);
+            if (result[idx] == NULL)
+            {
+                fprintf(stderr, "Erreur d'allocation mémoire\n");
+                // libérer ce qui a déjà été alloué
+                for (int i = 0; i < idx; i++) free(result[i]);
+                free(result);
+                return NULL;
+            }
+            strncpy(result[idx], start, len);
+            result[idx][len] = '\0';
+            idx++;
+            start = p + 1;
+        }
+        p++;
+    }
+
+    // Dernier morceau
+    int len = p - start;
+    result[idx] = (char *)malloc(len + 1);
+    strncpy(result[idx], start, len);
+    result[idx][len] = '\0';
+    idx++;
+
+    result[idx] = NULL; // terminaison du tableau
+
+    return result;
+}
+
+
+/***********************
+* Repeat
+***********************/
+char *repeat(char c, int nb)
+{
+    if (nb <= 0)
+    {
+        // Retourne une chaîne vide si nb <= 0
+        char *empty = (char *)malloc(1);
+        if (empty != NULL) {
+            empty[0] = '\0';
+        }
+        return empty;
+    }
+
+    // Allocation dynamique : nb caractères + '\0'
+    char *result = (char *)malloc(nb + 1);
+    if (result == NULL)
+    {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        return NULL;
+    }
+
+    // Remplissage avec le caractère c
+    memset(result, c, nb);
+
+    // Ajout du terminateur de chaîne
+    result[nb] = '\0';
+
+    return result;
+}
+
+/***********************
+* IsBlank
+***********************/
+bool isBlank(const char *str)
+{
+    if (str == NULL)
+    {
+        return true; // on considère NULL comme "blank"
+    }
+
+    // Parcours de chaque caractère
+    while (*str != '\0') {
+        if (!isspace((unsigned char)*str))
+        {
+            return false; // trouvé un caractère non blanc
+        }
+        str++;
+    }
+
+    return true; // tous les caractères sont blancs ou chaîne vide
+}
+
+/***********************
+* Contient ?
+***********************/
+bool contains(const char *str, const char *find)
+{
+    if (str == NULL || find == NULL)
+    {
+        return false; // sécurité
+    }
+
+    return strstr(str, find) != NULL;
+}
+
+/**********************
+* ReplaceFirst
+**********************/
+void replaceFirst(char *str, const char *src, const char *dst)
+{
+    if (str == NULL || src == NULL || dst == NULL) return;
+
+    int srcLen = strlen(src);
+    int dstLen = strlen(dst);
+
+    if (srcLen == 0) return; // éviter boucle infinie
+
+    // Trouver la première occurrence
+    char *pos = strstr(str, src);
+    if (pos == NULL) return; // rien à remplacer
+
+    // Calculer la taille du nouveau buffer
+    int newLen = strlen(str) - srcLen + dstLen;
+    char *result = (char *)malloc(newLen + 1); // +1 pour '\0'
+    if (result == NULL)
+    {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        return;
+    }
+
+    // Copie la partie avant l’occurrence
+    int prefixLen = pos - str;
+    memcpy(result, str, prefixLen);
+
+    // Copie la chaîne de remplacement
+    memcpy(result + prefixLen, dst, dstLen);
+
+    // Copie le reste après src
+    strcpy(result + prefixLen + dstLen, pos + srcLen);
+
+    // Copie le résultat final dans str
+    strcpy(str, result);
+
+    free(result);
+}
+
+
+/********************
+* replaceAll
+********************/
+void replaceAll(char *str, const char *src, const char *dst)
+{
+    if (str == NULL || src == NULL || dst == NULL) return;
+
+    int srcLen = strlen(src);
+    int dstLen = strlen(dst);
+
+    if (srcLen == 0) return; // éviter boucle infinie
+
+    // Compter le nombre d'occurrences de src
+    int count = 0;
+    char *pos = str;
+    while ((pos = strstr(pos, src)) != NULL)
+    {
+        count++;
+        pos += srcLen;
+    }
+
+    if (count == 0) return; // rien à remplacer
+
+    // Calculer la taille du nouveau buffer
+    int newLen = strlen(str) + count * (dstLen - srcLen);
+    char *result = (char *)malloc(newLen + 1); // +1 pour '\0'
+    if (result == NULL)
+    {
+        fprintf(stderr, "Erreur d'allocation mémoire\n");
+        return;
+    }
+
+    char *resPtr = result;
+    char *old = str;
+
+    // Remplacer chaque occurrence
+    while ((pos = strstr(old, src)) != NULL)
+    {
+        int len = pos - old;
+        memcpy(resPtr, old, len);   // copie avant src
+        resPtr += len;
+
+        memcpy(resPtr, dst, dstLen); // copie dst
+        resPtr += dstLen;
+
+        old = pos + srcLen;          // avance après src
+    }
+
+    // Copie le reste
+    strcpy(resPtr, old);
+
+    // Copie le résultat final dans str
+    strcpy(str, result);
+
+    free(result);
+}
+
+/*********************
+* LastIndexOf
+*********************/
+int lastIndexOf(char *str, char *rch)
+{
+    if (str == NULL || rch == NULL)
+    {
+        return -1; // Cas de sécurité
+    }
+
+    int lenStr = strlen(str);
+    int lenRch = strlen(rch);
+
+    if (lenRch == 0 || lenRch > lenStr)
+    {
+        return -1; // Sous-chaîne vide ou plus longue que str
+    }
+
+    // Parcours depuis la fin
+    for (int i = lenStr - lenRch; i >= 0; i--)
+    {
+        if (strncmp(&str[i], rch, lenRch) == 0)
+        {
+            return i; // Retourne l’indice de la dernière occurrence
+        }
+    }
+    return -1; // Non trouvée
+}
+
+/*********************
+* indexOf chaine
+*********************/
+int indexOf(char *str, char *rch)
+{
+    if (str == NULL || rch == NULL)
+    {
+        return -1; // Cas de sécurité
+    }
+
+    char *pos = strstr(str, rch); // strstr retourne un pointeur vers la première occurrence
+    if (pos == NULL)
+    {
+        return -1; // Sous-chaîne non trouvée
+    }
+
+    return (int)(pos - str); // Calcul de l’indice en soustrayant les pointeurs
+}
+
 /********************
 * Concatenation
 ********************/
@@ -155,7 +459,7 @@ int length(char *str)
 * Date Heure de maintenant
 * retour en char *
 ***************************/
-void now (char *output)
+void now(char *output)
 {
 
  time_t now;
@@ -234,7 +538,7 @@ void now (char *output)
 /********************
 *  UPERCASE
 ********************/
- void to_uppercase(char *str)
+ void toUpperCase(char *str)
 {
     while (*str)
     {
@@ -246,7 +550,7 @@ void now (char *output)
 /*******************
 * LOWERCASE
 *******************/
-void to_lowercase(char *str)
+void toLowerCase(char *str)
 {
     while (*str)
     {
@@ -329,7 +633,7 @@ void to_lowercase(char *str)
 /***************************
 * Remplacer tous les caractères
 ****************************/
-void replace_all(char *str, char from, char to)
+void replace(char *str, char from, char to)
 {
     while (*str)
     {

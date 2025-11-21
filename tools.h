@@ -9,16 +9,16 @@
 #include <stdbool.h>
 
  int length(char *str);
- void to_uppercase(char *str);
+ void toUpperCase(char *str);
  bool isEmpty(char *str);
  char charAt(char *str,int index);
- void to_lowercase(char *str);
+ void toLowerCase(char *str);
  void capitalize(char *str);
  void double_quotes(const char *input, char *output);
  void pad_left_zeros(const char *input, char *output, int total_length);
  void pad_right_zeros(const char *input, char *output, int total_length);
  void convert_date_format(const char *input, char *output);
- void replace_all(char *str, char from, char to);
+ void replace(char *str, char from, char to);
  char *trim(char *s);
  char *substring(const char *s, size_t from, size_t to);
  char *unquote_and_unescape(char *s);
@@ -29,23 +29,15 @@
  bool compareToIgnoreCase(const char *str, const char *compare);
  bool compareTo(const char *str, const char *compare);
  void concat(char *sourceA, const char *sourceB);
+ int indexOf(char *str, char *rch);
+ int lastIndexOf(char *str, char *rch);
+ void replaceAll(char *str, const char *src, const char *dst);
+ void replaceFirst(char *str, const char *src, const char *dst);
+ bool contains(const char *str, const char *find);
+ bool isBlank(const char *str);
+ char *repeat(char c, int nb);
+ char **splitWithDelimiters(const char *str, char separateur);
+ void strip(char *str);
 
- /*
-getBytes(String)
-indexOf(String)
-lastIndexOf(String)
-replace(char, char)
-contains(CharSequence)
-replaceFirst(String, String)
-replaceAll(String, String)
-split(String, int)
-splitWithDelimiters(String, int)
-join(CharSequence, CharSequence...)
-toLowerCase()
-toUpperCase()
-strip()
-isBlank()
-repeat(char,int)
-*/
 
 #endif // TOOLS_H_INCLUDED
