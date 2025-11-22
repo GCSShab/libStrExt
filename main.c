@@ -1,5 +1,13 @@
 #include "tools.h"
 
+#define TEST_ASSERT(expr) do { \
+    if (expr) { \
+        printf("[OK]   %s:%d: %s\n\n", __FILE__, __LINE__, #expr); \
+    } else { \
+        printf("[FAIL] %s:%d: %s\n\n", __FILE__, __LINE__, #expr); \
+    } \
+} while(0)
+
 int main()
 {
 
@@ -10,10 +18,14 @@ int main()
     char trt1[23]="  Hello boy boy boy   ";
 
     printf("test length |%s| size=%d\n",trt1,length(trt1));
+    TEST_ASSERT(length(trt1) == 22);
 
     printf("test trim |%s| => |%s|\n",trt1,trim(trt1));
+    TEST_ASSERT(strcmp(trim(trt1),"Hello boy boy boy")==0);
 
     printf("test charAt(5) => |%s| => |%c|\n",trt1,charAt(trt1,5));
+    TEST_ASSERT(charAt(trt1,5)=='l');
+
 
     printf("test substring(5,9) |%s| => |%s|\n",trt1,substring(trt1,5,9));
 
