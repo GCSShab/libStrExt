@@ -464,7 +464,6 @@ void now(char *output)
 
  time_t now;
  struct tm *local; //structure DH
-
     // Obtenir le temps actuel
     time(&now);
 
@@ -472,7 +471,7 @@ void now(char *output)
     local = localtime(&now);
 
     // Afficher la date et l'heure
-    sprintf(output,"%02d%02d%04d%02d%02d%02d",
+    sprintf(output,"%02d-%02d-%04d %02d:%02d:%02d",
            local->tm_mday,
            local->tm_mon + 1,
            local->tm_year + 1900,
