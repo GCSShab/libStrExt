@@ -25,4 +25,4 @@ clean:
 	-@rm libstrtools.a 2>/dev/null
 	-@rm libstrtools.so 2>/dev/null
 	-@rm test 2>/dev/null
-	-@rm tools.o 2>/dev/null
+	@echo "Nettoyage terminé"
