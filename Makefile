@@ -1,7 +1,3 @@
-# Déclaration des cibles phony (utilitaires)
-.PHONY: all lib test clean
-
-# Cible par défaut
 all: lib test
 
 # Construction des librairies (statique et dynamique)
@@ -19,6 +15,15 @@ lib: tools.c tools.h
 test: main.c tools.c tools.h lib
 	@gcc main.c -L. -lstrtools -Wl,-rpath=. -o test
 	@echo "Le programme de test est disponible : ./test"
+
+# Installation dans les répertoires systèmes
+install: lib
+	@echo "Installation de la librairie et du header..."
+	@sudo cp libstrtools.so /usr/local/lib/
+	@sudo cp libstrtools.a /usr/local/lib/
+	@sudo cp tools.h /usr/local/include/
+	@sudo ldconfig
+	@echo "Installation terminée : libstrtools.a -> /usr/local/lib, libstrtools.so -> /usr/local/lib, tools.h -> /usr/local/include"
 
 # Nettoyage
 clean:
